@@ -162,57 +162,7 @@ AND
 
 ## CloudFormation template to create workstation
 
-```
-Parameters:
-  LatestAmiId:
-    Type: 'AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>'
-    Default: '/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2'
-  SshKeyPair:
-    Type: AWS::EC2::KeyPair::KeyName
-  VpcId:
-    Type: AWS::EC2::VPC::Id
-  PublicSubnet:
-    Type: AWS::EC2::Subnet::Id
-Resources:
-  EC2Role:
-    Type: AWS::IAM::Role
-    Properties:
-      AssumeRolePolicyDocument:
-        Statement:
-        - Effect: Allow
-          Principal:
-            Service: [ec2.amazonaws.com]
-          Action: ['sts:AssumeRole']
-      ManagedPolicyArns:
-      - arn:aws:iam::aws:policy/AdministratorAccess   # https://docs.aws.amazon.com/parallelcluster/latest/ug/iam.html#defaults
-  EC2InstanceProfile:
-    Type: AWS::IAM::InstanceProfile
-    Properties:
-      Roles: [!Ref 'EC2Role']
-  SecurityGroup:
-    Type: AWS::EC2::SecurityGroup
-    Properties:
-      GroupDescription: SG to allow SSH
-      VpcId: !Ref VpcId
-      SecurityGroupIngress:
-        - IpProtocol: tcp
-          FromPort: 22
-          ToPort: 22
-          CidrIp: 0.0.0.0/0
-      SecurityGroupEgress:
-        - IpProtocol: "-1"
-          FromPort: "-1"
-          ToPort: "-1"
-          CidrIp: 0.0.0.0/0
-  Instance:
-    Type: 'AWS::EC2::Instance'
-    Properties:
-      ImageId: !Ref LatestAmiId
-      InstanceType: t2.medium
-      KeyName: !Ref SshKeyPair
-      SubnetId: !Ref PublicSubnet
-      IamInstanceProfile: !Ref EC2InstanceProfile
-```
+![](workstation-cfn.yaml)
 
 
 
