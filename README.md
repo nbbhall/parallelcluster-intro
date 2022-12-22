@@ -162,7 +162,7 @@ AND
 
 ## CloudFormation template to create workstation
 
-![](workstation-cfn.yaml)
+[template](workstation-cfn.yaml)
 
 
 
