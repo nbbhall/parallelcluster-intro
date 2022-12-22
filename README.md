@@ -174,6 +174,7 @@ AND
 ```
 aws configure # set region only
 
+# Install python3 and pip
 sudo yum install python37 -y
 curl -O https://bootstrap.pypa.io/get-pip.py
 python3 get-pip.py
@@ -181,15 +182,17 @@ python3 -m pip install --upgrade pip
 python3 -m pip install --user --upgrade virtualenv
 python3 -m virtualenv ~/apc-ve
 
-
+# setup virtualenv
 source ~/apc-ve/bin/activate      # needs to be performed in every new session
 
+# Install pcluster CLI
 python3 -m pip install --upgrade "aws-parallelcluster"
-(apc-ve) [root@ip-172-31-4-74 ~]# pcluster version
-{
-"version": "3.3.1"
-}
-# Node.js installation – required by CDKcurl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash
+
+# Verify install
+pcluster version
+
+# Node.js installation – required by CDK
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash
 chmod ug+x ~/.nvm/nvm.sh
 source ~/.nvm/nvm.sh # needs to be performed in every new session
 # nvm install --lts
@@ -276,13 +279,13 @@ Copy SSH key to jump box and chmod 400
 ## pcluster create-cluster (awsbatch) - Lab
 
 ```
-pcluster create-cluster --cluster-configuration cluster-config-awsbatch.yaml --cluster-name cluster-name --region us-east-1
+pcluster create-cluster --cluster-configuration cluster-config-awsbatch.yaml --cluster-name awsbatch --region us-east-1
 ```
 
 ```
 {
   "cluster": {
-    "clusterName": "cluster-name",
+    "clusterName": "awsbatch",
     "cloudformationStackStatus": "CREATE_IN_PROGRESS",
     "cloudformationStackArn": "arn:aws:cloudformation:us-east-1:419264005465:stack/cluster-name/ca529720-79c2-11ed-9fb1-0e23c4409c71",
     "region": "us-east-1",
@@ -298,7 +301,7 @@ pcluster create-cluster --cluster-configuration cluster-config-awsbatch.yaml --c
 ```
 pcluster list-clusters
 
-pcluster describe-cluster -n cluster-name
+pcluster describe-cluster -n awsbatch
 ```
 
 <p>&nbsp;</p>
@@ -335,9 +338,6 @@ cat ~/.parallelcluster/pcluster-cli.log
 
 ```
 
-```
-cat ~/.parallelcluster/config
-```
 
 <p>&nbsp;</p>
 
@@ -345,7 +345,7 @@ cat ~/.parallelcluster/config
 
 From bastion
 ```
-pcluster ssh -n cluster-name -i key.pem 
+pcluster ssh -n awsbatch -i key.pem 
 
 cat /etc/parallelcluster/cfnconfig
 
@@ -355,15 +355,13 @@ awsbqueues
 
 From head node
 ```
-awsbsub -jn get-instanceid -c cluster-name -p 2 -m 1024 curl 169.254.169.254/latest/meta-data/instance-id
+awsbsub -jn get-instanceid -c awsbatch -p 2 -m 1024 curl 169.254.169.254/latest/meta-data/instance-id
 awsbstat -s ALL
 awsbstat 0127e786-34ae-438a-ab00-1db6540c6f95
 awsbstat -s SUCCEEDED
-awsbstat -d 
 awsbhosts
 awsbout 0127e786-34ae-438a-ab00-1db6540c6f95
 awsbkill
-awsbqueues
 ```
 
 <p>&nbsp;</p>
@@ -422,10 +420,6 @@ HeadNode:
     SubnetId: subnet-bfbc419e
   Ssh:
     KeyName: useast1
-  Iam:
-    S3Access:
-    - BucketName: mytestbucket123-qwerty
-      EnableWriteAccess: false
 Scheduling:
   Scheduler: slurm
   SlurmQueues:
@@ -628,6 +622,8 @@ pcluster build-image ..
 <p>&nbsp;</p>
 
 ## AMI patching
+
+[AMI replacement](https://docs.aws.amazon.com/parallelcluster/latest/ug/instance-updates-ami-patch.html)
 
 ```
 pcluster list-official-images
